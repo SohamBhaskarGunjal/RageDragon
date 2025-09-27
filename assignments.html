@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assignments</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom right,#2e003e,#000000);
+        color: white;
+    }
+
+    /* --- Navigation Bar --- */
+    nav {
+        background: #2e003e;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        padding: 15px 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    nav button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        position: relative;
+    }
+    nav button:hover { color: #bb86fc; }
+
+    /* Tooltips */
+    nav button::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #3d0055;
+        color: #fff;
+        padding: 5px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        box-shadow: 0 0 5px rgba(0,0,0,0.4);
+    }
+    nav button:hover::after {
+        opacity: 1;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+    h2 { text-align: center; margin-bottom: 20px; }
+
+    .assignment-box {
+        background: #2e003e;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .assignment-box:hover { background: #bb86fc; color: black; }
+
+    .assignment-detail {
+        display: none;
+        margin-top: 10px;
+        padding: 10px;
+        background: #3d0055;
+        border-radius: 8px;
+    }
+
+    .upload-btn {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        background: #bb86fc;
+        color: black;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .upload-btn:hover { background: #9a67ea; }
+
+    .no-data {
+        text-align: center;
+        padding: 20px;
+        background: #2e003e;
+        border-radius: 10px;
+        color: #bb86fc;
+    }
+</style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav>
+    <button data-tooltip="Go to Dashboard" onclick="goToPage('new1.html')">Dashboard</button>
+    <button data-tooltip="Check Attendance" onclick="goToPage('attendance.html')">Attendance</button>
+    <button data-tooltip="View Assignments" onclick="goToPage('assignments.html')">Assignments</button>
+    <button data-tooltip="See Notes" onclick="goToPage('notes.html')">Notes</button>
+    <button data-tooltip="Focus Mode"  onclick="goToPage('focus.html')">Focus</button>
+    <button data-tooltip="Reply to Doubts"  onclick="goToPage('reply.html')">Reply</button>
+</nav>
+
+<div class="container">
+    <h2>Your Assignments</h2>
+    <div id="assignmentContainer" class="no-data">No assignments available</div>
+</div>
+
+<script>
+function goToPage(page){
+    window.location.href = page;
+}
+
+// Example assignments data (replace with real data if needed)
+let assignments = [
+    {
+        subject: "Math",
+        title: "Algebra Worksheet",
+        details: "Solve all questions from chapter 5. Submit by 5th Oct.",
+    },
+    {
+        subject: "Science",
+        title: "Plant Cells Assignment",
+        details: "Draw and label parts of a plant cell. Submit photo."
+    }
+];
+
+// Render assignments
+let container = document.getElementById('assignmentContainer');
+container.innerHTML = ''; // clear default "no data"
+
+if(assignments.length === 0){
+    container.innerHTML = '<div class="no-data">No assignments available</div>';
+} else {
+    assignments.forEach((assign, index) => {
+        let box = document.createElement('div');
+        box.className = 'assignment-box';
+        box.innerHTML = `<strong>${assign.subject}</strong> - ${assign.title}`;
+
+        // Detail div
+        let detailDiv = document.createElement('div');
+        detailDiv.className = 'assignment-detail';
+        detailDiv.innerHTML = `
+            <p>${assign.details}</p>
+            <input type="file" id="file${index}" style="display:none;">
+            <button class="upload-btn" onclick="document.getElementById('file${index}').click();">Upload Assignment</button>
+        `;
+
+        box.addEventListener('click', () => {
+            detailDiv.style.display = detailDiv.style.display === 'block' ? 'none' : 'block';
+        });
+
+        container.appendChild(box);
+        container.appendChild(detailDiv);
+    });
+}
+</script>
+
+</body>
+</html>

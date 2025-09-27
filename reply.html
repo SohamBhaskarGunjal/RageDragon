@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Replies</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom right,#2e003e,#000000);
+    color: white;
+}
+
+/* --- Navigation Bar --- */
+nav {
+    background: #2e003e;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+nav button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    position: relative;
+}
+nav button:hover { color: #bb86fc; }
+
+/* Tooltips */
+nav button::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #3d0055;
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    box-shadow: 0 0 5px rgba(0,0,0,0.4);
+}
+nav button:hover::after {
+    opacity: 1;
+}
+
+.container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+}
+h2 { text-align: center; margin-bottom: 20px; }
+
+.reply-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #2e003e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.reply-btn:hover { background: #bb86fc; color: black; }
+
+.reply-detail {
+    display: none;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #3d0055;
+    border-radius: 8px;
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+    background: #2e003e;
+    border-radius: 10px;
+    color: #bb86fc;
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav>
+    <button data-tooltip="Go to Dashboard" onclick="goToPage('new1.html')">Dashboard</button>
+    <button data-tooltip="Check Attendance" onclick="goToPage('attendance.html')">Attendance</button>
+    <button data-tooltip="View Assignments" onclick="goToPage('assignments.html')">Assignments</button>
+    <button data-tooltip="See Notes" onclick="goToPage('notes.html')">Notes</button>
+    <button data-tooltip="Focus Mode"  onclick="goToPage('focus.html')">Focus</button>
+    <button data-tooltip="Reply to Doubts"  onclick="goToPage('reply.html')">Reply</button>
+</nav>
+
+<div class="container">
+    <h2>Teacher Replies</h2>
+    <div id="replyContainer" class="no-data">No replies yet</div>
+</div>
+
+<script>
+function goToPage(page){
+    window.location.href = page;
+}
+
+// Example replies data (replace with real data)
+let replies = [
+    {
+        subject: "Math",
+        reply: "Please check chapter 5, question 12. I have provided hints."
+    },
+    {
+        subject: "Science",
+        reply: "Your doubt about plant cells is answered in slide 10 of the notes."
+    }
+];
+
+// Render replies
+let container = document.getElementById('replyContainer');
+container.innerHTML = '';
+
+if(replies.length === 0){
+    container.innerHTML = '<div class="no-data">No replies yet</div>';
+} else {
+    replies.forEach((item, index) => {
+        let btn = document.createElement('button');
+        btn.className = 'reply-btn';
+        btn.textContent = item.subject;
+        
+        let detailDiv = document.createElement('div');
+        detailDiv.className = 'reply-detail';
+        detailDiv.textContent = item.reply;
+
+        btn.addEventListener('click', () => {
+            detailDiv.style.display = detailDiv.style.display === 'block' ? 'none' : 'block';
+        });
+
+        container.appendChild(btn);
+        container.appendChild(detailDiv);
+    });
+}
+</script>
+
+</body>
+</html>

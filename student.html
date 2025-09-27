@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard</title>
+<style>
+    body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom right,#2e003e,#000000);
+    color: white;
+}
+
+/* Navigation stays at top */
+nav {
+    background: #2e003e;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+nav button:hover {
+    color: #bb86fc;
+}
+
+/* Main container centered */
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* leave space for nav */
+    padding: 20px;
+    text-align: center;
+}
+
+.welcome-box {
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.interesting-box {
+    background: #2e003e;
+    padding: 25px 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    margin-bottom: 20px;
+}
+
+.interesting-box p {
+    margin: 10px 0;
+    color: #bb86fc;
+    font-weight: bold;
+}
+
+.interesting-box button {
+    padding: 12px 25px;
+    font-size: 16px;
+    background: #bb86fc;
+    color: black;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.interesting-box button:hover {
+    background: #9a67ea;
+}
+nav {
+    background: #2e003e;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav button {
+    position: relative; /* needed for tooltip positioning */
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+nav button:hover {
+    color: #bb86fc;
+}
+
+/* Tooltip */
+nav button::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 125%; /* show below button instead of above */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #bb86fc;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s;
+    font-size: 14px;
+    z-index: 1000; /* ensure tooltip is on top */
+}
+
+
+nav button:hover::after {
+    opacity: 1;
+}
+
+</style>
+</head>
+<body>
+
+<nav>
+    <button data-tooltip="Go to Dashboard" onclick="goToPage('new1.html')">Dashboard</button>
+    <button data-tooltip="Check Attendance" onclick="goToPage('attendance.html')">Attendance</button>
+    <button data-tooltip="View Assignments" onclick="goToPage('assignments.html')">Assignments</button>
+    <button data-tooltip="See Notes" onclick="goToPage('notes.html')">Notes</button>
+    <button data-tooltip="Focus Mode"  onclick="goToPage('focus.html')">Focus</button>
+    <button data-tooltip="Reply to Doubts"  onclick="goToPage('reply.html')">Reply</button>
+</nav>
+<script>
+function goToPage(page){
+    window.location.href = page;
+}
+</script>
+
+<div class="container">
+    <div class="welcome-box">
+        Welcome, <span id="usernameDisplay">Student</span>! Let's get started!
+    </div>
+
+    <div class="interesting-box">
+        <p>Interesting Thing!</p>
+        <p>Now you can ask your doubts anonymously</p>
+        <button onclick="goToDoubt()">Ask Now!</button>
+    </div>
+</div>
+
+<script>
+    // Display stored username if available
+    let username = localStorage.getItem('studentUsername') || 'Student';
+    document.getElementById('usernameDisplay').textContent = username;
+
+    function goToDoubt(){
+        window.location.href = 'doubt.html';
+    }
+</script>
+
+</body>
+</html>

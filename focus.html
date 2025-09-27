@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focus Mode</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom right,#2e003e,#000000);
+        color: white;
+        text-align: center;
+    }
+
+    /* --- Navigation Bar --- */
+    nav {
+        background: #2e003e;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        padding: 15px 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    nav button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        position: relative;
+    }
+    nav button:hover { color: #bb86fc; }
+
+    /* Tooltips */
+    nav button::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #3d0055;
+        color: #fff;
+        padding: 5px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        box-shadow: 0 0 5px rgba(0,0,0,0.4);
+    }
+    nav button:hover::after {
+        opacity: 1;
+    }
+
+    /* --- Container --- */
+    .container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #2e003e;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+    h2 { margin-bottom: 20px; }
+
+    .time-select { margin: 15px 0; }
+    select {
+        padding: 8px;
+        margin: 5px;
+        border-radius: 6px;
+        border: none;
+        font-size: 14px;
+    }
+
+    .timer {
+        font-size: 28px;
+        margin: 20px 0;
+        font-weight: bold;
+    }
+
+    .btn {
+        margin: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        background: #bb86fc;
+        color: black;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .btn:hover { background: #9a67ea; }
+
+    /* --- Modal --- */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7);
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content {
+        background: #2e003e;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        width: 300px;
+        box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+    .plant-option {
+        margin: 10px 0;
+        padding: 8px;
+        border-radius: 6px;
+        background: #bb86fc;
+        color: black;
+        cursor: pointer;
+    }
+    .plant-option:hover {
+        background: #9a67ea;
+    }
+
+    /* Plant Circle */
+    .plant-circle {
+        width: 80px;
+        height: 80px;
+        margin: 10px auto;
+        border-radius: 50%;
+        border: 3px solid #bb86fc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 28px;
+        background: #3d0055;
+    }
+
+    /* Back Button in Modal */
+    .back-btn {
+        margin-top: 10px;
+        padding: 8px 16px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: none;
+        background: #bb86fc;
+        color: black;
+        cursor: pointer;
+    }
+    .back-btn:hover { background: #9a67ea; }
+</style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav>
+    <button data-tooltip="Go to Dashboard" onclick="goToPage('new1.html')">Dashboard</button>
+    <button data-tooltip="Check Attendance" onclick="goToPage('attendance.html')">Attendance</button>
+    <button data-tooltip="View Assignments" onclick="goToPage('assignments.html')">Assignments</button>
+    <button data-tooltip="See Notes" onclick="goToPage('notes.html')">Notes</button>
+    <button data-tooltip="Focus Mode" onclick="goToPage('focus.html')">Focus</button>
+    <button data-tooltip="Reply to Doubts" onclick="goToPage('reply.html')">Reply</button>
+</nav>
+
+<div class="container">
+    <h2>Focus Mode</h2>
+
+    <!-- Plant Display Circle -->
+    <div class="plant-circle" id="plantDisplay">?</div>
+
+    <!-- Time Select -->
+    <div class="time-select">
+        <label>Hours:</label>
+        <select id="hours">
+            <option value="0">0</option>
+            <option value="1">1</option><option value="2">2</option>
+            <option value="3">3</option><option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <label>Minutes:</label>
+        <select id="minutes">
+            <option value="0">0</option>
+            <option value="10">10</option><option value="20">20</option>
+            <option value="30">30</option><option value="40">40</option>
+            <option value="50">50</option>
+        </select>
+    </div>
+
+    <!-- Timer Display -->
+    <div class="timer" id="timerDisplay">00:00:00</div>
+
+    <!-- Action Buttons -->
+    <button class="btn" onclick="openPlantModal()">Select Plant</button>
+    <button class="btn" onclick="startFocus()">Start</button>
+    <button class="btn" onclick="openRecords()">View Records</button>
+    <button class="btn" onclick="quitFocus()">Quit</button>
+</div>
+
+<!-- Plant Modal -->
+<div class="modal" id="plantModal">
+  <div class="modal-content">
+    <h3>Select a Plant 🌱</h3>
+    <div class="plant-option" onclick="choosePlant('🌹 Rose')">🌹 Rose</div>
+    <div class="plant-option" onclick="choosePlant('🌷 Tulip')">🌷 Tulip</div>
+    <div class="plant-option" onclick="choosePlant('🌻 Sunflower')">🌻 Sunflower</div>
+    <div class="plant-option" onclick="choosePlant('🌵 Cactus')">🌵 Cactus</div>
+    <div class="plant-option" onclick="choosePlant('🌳 Bonsai')">🌳 Bonsai</div>
+    <button class="back-btn" onclick="closePlantModal()">Back</button>
+  </div>
+</div>
+
+<!-- Records Modal -->
+<div class="modal" id="recordsModal">
+  <div class="modal-content">
+    <h3>📖 Focus Records</h3>
+    <ul id="recordsList" style="text-align:left; padding:0; list-style:none;"></ul>
+    <button class="btn" onclick="closeRecords()">Close</button>
+  </div>
+</div>
+
+<script>
+let countdown;
+let totalSeconds = 0;
+let remainingSeconds = 0;
+let selectedPlant = null;
+let records = JSON.parse(localStorage.getItem("focusRecords") || "[]");
+
+function goToPage(page){ window.location.href = page; }
+
+function updateDisplay(){
+    let hrs = Math.floor(remainingSeconds / 3600);
+    let mins = Math.floor((remainingSeconds % 3600) / 60);
+    let secs = remainingSeconds % 60;
+    document.getElementById("timerDisplay").textContent =
+        String(hrs).padStart(2,'0') + ":" +
+        String(mins).padStart(2,'0') + ":" +
+        String(secs).padStart(2,'0');
+}
+
+function startFocus(){
+    let hrs = parseInt(document.getElementById("hours").value);
+    let mins = parseInt(document.getElementById("minutes").value);
+
+    if(hrs === 0 && mins === 0){
+        alert("Hours and minutes cannot both be 0!");
+        return;
+    }
+    if(!selectedPlant){
+        alert("Please select a plant first!");
+        return;
+    }
+
+    totalSeconds = (hrs * 3600) + (mins * 60);
+    remainingSeconds = totalSeconds;
+    updateDisplay();
+
+    if(countdown) clearInterval(countdown);
+    countdown = setInterval(()=>{
+        remainingSeconds--;
+        updateDisplay();
+
+        if(remainingSeconds <= 0){
+            clearInterval(countdown);
+            alert("🎉 Great job! You completed your focus session with " + selectedPlant + "!");
+            saveRecord(hrs, mins, selectedPlant, true);
+            window.location.href = "focus.html";
+        }
+    },1000);
+}
+
+function quitFocus(){
+    if(!countdown){
+        alert("No focus session is running!");
+        return;
+    }
+    let confirmQuit = confirm("Are you sure you want to quit?");
+    if(confirmQuit){
+        clearInterval(countdown);
+        alert("❌ Quit before completing.");
+        saveRecord(0,0,selectedPlant,false);
+        window.location.href = "focus.html";
+    }
+}
+
+/* --- Plant Modal --- */
+function openPlantModal(){ document.getElementById("plantModal").style.display="flex"; }
+function closePlantModal(){ document.getElementById("plantModal").style.display="none"; }
+
+function choosePlant(plant){
+    selectedPlant = plant;
+    document.getElementById("plantDisplay").textContent = plant;
+    document.getElementById("plantModal").style.display="none";
+    alert("🌱 You selected " + plant + "!");
+}
+
+/* --- Records --- */
+function saveRecord(h,m,plant,completed){
+    if(!plant) plant = "No plant selected";
+    let date = new Date().toLocaleString();
+    records.push({
+        date: date,
+        plant: plant,
+        duration: h+"h "+m+"m",
+        status: completed ? "✅ Completed" : "❌ Quit"
+    });
+    localStorage.setItem("focusRecords", JSON.stringify(records));
+}
+
+function openRecords(){
+    let list = document.getElementById("recordsList");
+    list.innerHTML = "";
+    if(records.length === 0){
+        list.innerHTML = "<li>No records yet.</li>";
+    } else {
+        records.forEach(r=>{
+            let li = document.createElement("li");
+            li.textContent = `${r.date} - ${r.plant} - ${r.duration} - ${r.status}`;
+            list.appendChild(li);
+        });
+    }
+    document.getElementById("recordsModal").style.display="flex";
+}
+function closeRecords(){ document.getElementById("recordsModal").style.display="none"; }
+</script>
+
+</body>
+</html>

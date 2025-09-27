@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Classroom Memory Hub</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch&family=Orbitron:wght@700&family=Poppins:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      /* Base Styles */
+      :root {
+        --primary: #9d00ff;
+        --secondary: #00e5ff;
+        --accent: #ff00e5;
+        --background: #050510;
+        --card-bg: rgba(20, 20, 40, 0.7);
+        --text-primary: #ffffff;
+        --text-secondary: #b8b8ff;
+        --glow-primary: 0 0 10px rgba(157, 0, 255, 0.7),
+          0 0 20px rgba(157, 0, 255, 0.5);
+        --glow-secondary: 0 0 10px rgba(0, 229, 255, 0.7),
+          0 0 20px rgba(0, 229, 255, 0.5);
+        --glow-accent: 0 0 10px rgba(255, 0, 229, 0.7),
+          0 0 20px rgba(255, 0, 229, 0.5);
+        --card-width: 300px;
+        --card-height: 420px;
+        --carousel-radius: 400px;
+        --transition-speed: 0.5s;
+        --dark-bg: #0a0a0f;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        min-height: 100%;
+        font-family: "Chakra Petch", sans-serif;
+        background-color: var(--background);
+        color: var(--text-primary);
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Typography */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+
+      .title {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 15px rgba(157, 0, 255, 0.5);
+        animation: pulse 3s infinite alternate;
+        text-align: center;
+      }
+
+      /* Cosmic Background */
+      .cosmos-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: radial-gradient(
+          ellipse at bottom,
+          #1b2735 0%,
+          #090a0f 100%
+        );
+        overflow: hidden;
+      }
+
+      .stars-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(
+            1px 1px at 25% 25%,
+            white,
+            rgba(0, 0, 0, 0)
+          ),
+          radial-gradient(1px 1px at 50% 50%, white, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 75% 75%, white, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 100% 100%, white, rgba(0, 0, 0, 0));
+        background-size: 200px 200px, 300px 300px, 400px 400px, 600px 600px;
+        background-repeat: repeat;
+        animation: twinkle 10s linear infinite;
+      }
+
+      @keyframes twinkle {
+        0% {
+          background-position: 0 0, 0 0, 0 0, 0 0;
+        }
+        100% {
+          background-position: 200px 200px, 300px 300px, 400px 400px,
+            600px 600px;
+        }
+      }
+
+      /* Carousel Container */
+      .carousel-container {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        perspective: 1000px;
+        transform-style: preserve-3d;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        touch-action: none;
+      }
+
+      .carousel {
+        position: relative;
+        width: var(--carousel-radius);
+        height: var(--carousel-radius);
+        transform-style: preserve-3d;
+        transition: transform 0.5s ease;
+      }
+
+      /* Memory Cards */
+      .memory-card {
+        position: absolute;
+        width: var(--card-width);
+        height: var(--card-height);
+        left: 50%;
+        top: 50%;
+        margin-left: calc(var(--card-width) / -2);
+        margin-top: calc(var(--card-height) / -2);
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+      }
+
+      .card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .memory-card:hover .card-inner {
+        transform: translateZ(20px);
+      }
+
+      .memory-card.flipped .card-inner {
+        transform: rotateY(180deg);
+      }
+
+      .card-front,
+      .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .card-front {
+        background: linear-gradient(
+          135deg,
+          rgba(30, 30, 60, 0.8),
+          rgba(20, 20, 40, 0.9)
+        );
+        border: 1px solid rgba(157, 0, 255, 0.3);
+        transform-style: preserve-3d;
+      }
+
+      .card-back {
+        background: linear-gradient(
+          135deg,
+          rgba(20, 20, 40, 0.9),
+          rgba(30, 30, 60, 0.8)
+        );
+        border: 1px solid rgba(0, 229, 255, 0.3);
+        transform: rotateY(180deg);
+      }
+
+      .card-content {
+        padding: 20px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      .memory-date {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.8rem;
+        color: var(--accent);
+        margin-bottom: 10px;
+        text-shadow: 0 0 5px rgba(255, 0, 229, 0.7);
+      }
+
+      .memory-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: var(--text-primary);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      }
+
+      .memory-image {
+        width: 100%;
+        height: 150px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .memory-image i {
+        color: var(--primary);
+        font-size: 4rem;
+        text-shadow: var(--glow-primary);
+        animation: pulse 3s infinite alternate;
+        z-index: 2;
+      }
+
+      .glitch-effect {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          45deg,
+          transparent 65%,
+          rgba(157, 0, 255, 0.3) 70%,
+          transparent 75%
+        );
+        background-size: 200% 200%;
+        animation: glitch 3s linear infinite;
+        z-index: 1;
+      }
+
+      @keyframes glitch {
+        0% {
+          background-position: 0 0;
+        }
+        25% {
+          background-position: 100% 0;
+        }
+        50% {
+          background-position: 100% 100%;
+        }
+        75% {
+          background-position: 0 100%;
+        }
+        100% {
+          background-position: 0 0;
+        }
+      }
+
+      .memory-preview {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 15px;
+        flex-grow: 1;
+      }
+
+      .card-back .card-content p {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        line-height: 1.5;
+        flex-grow: 1;
+      }
+
+      .memory-coordinates {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.8rem;
+        color: var(--secondary);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .time-stamp {
+        color: var(--accent);
+      }
+
+      .card-glow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 15px;
+        pointer-events: none;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(157, 0, 255, 0.1),
+          transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .memory-card:hover .card-glow {
+        opacity: 1;
+      }
+
+      /* Carousel Controls */
+      .carousel-controls {
+        position: absolute;
+        bottom: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        z-index: 10;
+      }
+
+      .control-btn {
+        background: rgba(20, 20, 40, 0.7);
+        border: 1px solid var(--primary);
+        color: var(--text-primary);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--glow-primary);
+      }
+
+      .control-btn:hover {
+        background: rgba(30, 30, 60, 0.9);
+        transform: scale(1.1);
+      }
+
+      /* Navbar Tabs */
+      nav {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        padding: 1.5rem;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: bold;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        font-family: "Poppins", sans-serif;
+      }
+      nav a {
+        color: white;
+        text-decoration: none;
+        transition: transform 0.3s;
+      }
+      nav a:hover {
+        transform: scale(1.1) rotateX(10deg);
+        color: var(--secondary);
+      }
+
+      /* Teacher Desk (Center) */
+      .teacher-desk {
+        margin: 5rem auto;
+        width: 400px;
+        height: 200px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 20px;
+        box-shadow: 0 0 25px rgba(157, 8, 255, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        transform: rotateX(15deg) rotateY(-10deg);
+        transition: transform 0.6s ease;
+        font-family: "Orbitron", sans-serif;
+      }
+      .teacher-desk:hover {
+        transform: rotateX(0) rotateY(0) scale(1.05);
+      }
+
+      /* Classroom Details */
+      .classroom-details {
+        margin: 3rem auto;
+        width: 80%;
+        display: flex;
+        justify-content: space-around;
+        text-align: center;
+      }
+      .classroom-details .card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: 15px;
+        width: 200px;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        transition: transform 0.4s;
+        font-family: "Poppins", sans-serif;
+      }
+      .classroom-details .card:hover {
+        transform: translateY(-10px) rotateY(10deg);
+      }
+
+      /* Positive Thought */
+      .thought {
+        margin: 4rem auto;
+        font-size: 1.5rem;
+        font-style: italic;
+        text-align: center;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: fadeIn 4s infinite alternate;
+        font-family: "Poppins", sans-serif;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0.5;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Achievements */
+      .achievements {
+        margin: 4rem auto;
+        width: 90%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+      }
+      .achievements .item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(157, 8, 255, 0.6);
+        transition: transform 0.4s;
+        font-family: "Poppins", sans-serif;
+      }
+      .achievements .item img {
+        width: 100%;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+      }
+      .achievements .item:hover {
+        transform: rotateY(10deg) scale(1.05);
+      }
+
+      /* Animations */
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.8;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      /* Spacing and Divider */
+      .carousel-section {
+        margin-bottom: 8rem; /* Increased spacing */
+      }
+
+      .section-divider {
+        width: 80%;
+        height: 2px;
+        margin: 2rem auto;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--primary) 50%,
+          transparent
+        );
+        box-shadow: var(--glow-primary);
+        opacity: 0.7;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        :root {
+          --card-width: 250px;
+          --card-height: 350px;
+          --carousel-radius: 300px;
+        }
+
+        .title {
+          font-size: 1.8rem;
+        }
+
+        .carousel-container {
+          height: 800px;
+        }
+
+        .memory-card h3 {
+          font-size: 1.2rem;
+        }
+
+        .memory-image {
+          height: 120px;
+        }
+
+        .teacher-desk {
+          width: 600px;
+          height: 300px;
+          font-size: 3.5rem;
+        }
+
+        .classroom-details .card {
+          width: 150px;
+          padding: 1.5rem;
+        }
+
+        .carousel-section {
+          margin-bottom: 6rem; /* Adjusted spacing */
+        }
+
+        .section-divider {
+          width: 90%;
+          margin: 1.5rem auto;
+        }
+      }
+
+      @media (max-width: 576px) {
+        :root {
+          --card-width: 220px;
+          --card-height: 320px;
+          --carousel-radius: 250px;
+        }
+
+        .title {
+          font-size: 1.5rem;
+        }
+
+        .carousel-container {
+          height: 350px;
+        }
+
+        .teacher-desk {
+          width: 250px;
+          height: 120px;
+          font-size: 1.2rem;
+        }
+
+        .classroom-details {
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .classroom-details .card {
+          width: 80%;
+          max-width: 200px;
+        }
+
+        .carousel-section {
+          margin-bottom: 4rem; /* Adjusted spacing */
+        }
+
+        .section-divider {
+          width: 95%;
+          margin: 1rem auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cosmos-background">
+      <div class="stars-container"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav>
+      <a href="new1.html">Home</a>
+      <a href="attendance.html">Attendance</a>
+      <a href="focus.html">Focus</a>
+      <a href="#">Notice</a>
+      <a href="notes.htm">Notes</a>
+      <a href="assignments.html">Assignment</a>
+      <a href="reply.html">Anonymous Doubt</a>
+    </nav>
+
+    <div class="container-fluid d-flex flex-column">
+      <section class="carousel-section">
+        <h1 class="title">Teacher's Desk</h1>
+        <main
+          class="flex-grow-1 d-flex align-items-center justify-content-center position-relative"
+        >
+          <div class="carousel-container">
+            <div class="carousel" id="memory-carousel">
+              <div class="memory-card" data-memory-id="1">
+                <div class="card-inner">
+                  <div class="card-front">
+                    <div class="card-content">
+                      <div class="memory-date">ClassConnect</div>
+                      <h3>Connecting Classrooms & Inspiring Learning </h3>
+                      <div class="memory-image">
+                        <i class="fa-solid fa-code fa-3x"></i>
+                        <div class="glitch-effect"></div>
+                      </div>
+                      <p class="memory-preview">
+                        
+                      </p>
+                      <div class="card-glow"></div>
+                    </div>
+                  </div>
+                  <div class="card-back">
+                    <div class="card-content">
+                      <h3>Think & Thrive</h3>
+                      <p>
+                        A digital platform that bridges the gap between 
+                        teachers and students by providing a common space 
+                        for learning, communication, and collaboration. 
+                      
+                      </p>
+                      <div class="memory-coordinates">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="memory-card" data-memory-id="2">
+                <div class="card-inner">
+                  <div class="card-front">
+                    <div class="card-content">
+                      <div class="memory-date">Quantam Knowledge</div>
+                      <h3> The Science Table </h3>
+                      <div class="memory-image">
+                        <i class="fa-solid fa-bug fa-3x"></i>
+                        <div class="glitch-effect"></div>
+                      </div>
+                      <p class="memory-preview">
+                      Explore. Experiment. Excel
+                      </p>
+                      <div class="card-glow"></div>
+                    </div>
+                  </div>
+                  <div class="card-back">
+                    <div class="card-content">
+                      <h3>Science Zone</h3>
+                      <p>
+                        From experiments and lessons to interactive resources and
+                        collaboration, it  makes science exciting, fun, and easy 
+                       to access—turning curiosity into knowledge, one experiment at 
+                        a time.
+                      </p>
+                      <div class="memory-coordinates">
+                      
+                      
+                      
+                      
+                      
+                      
+                  
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="memory-card" data-memory-id="3">
+                <div class="card-inner">
+                  <div class="card-front">
+                    <div class="card-content">
+                      <div class="memory-date">CONCEPT: </div>
+                      <h3>The Math Library</h3>
+                      <div class="memory-image">
+                        <i class="fa-solid fa-book-open fa-3x"></i>
+                        <div class="glitch-effect"></div>
+                      </div>
+                      <p class="memory-preview">
+                       It’s a toolbox of ready-made math formulas for programming.
+                      </p>
+                      <div class="card-glow"></div>
+                    </div>
+                  </div>
+                  <div class="card-back">
+                    <div class="card-content">
+                      <h3>The Math Library</h3>
+                      <p> The Math Library is a vast compendium of algorithms and data structures,
+                        each more complex than the last. As I delved into its pages,
+                        I felt my mind expanding, grappling with concepts like
+                        Big O notation, recursion, and graph theory.
+                       
+                      </p>
+                      <div class="memory-coordinates">
+                        <span
+                          ><i class="fa-solid fa-location-dot"></i> Stack
+                          Overflow</span
+                        >
+                        <span class="time-stamp"
+                          ><i class="fa-regular fa-clock"></i> 11:05:40</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+            </div>
+          </div>
+
+          <div class="carousel-controls">
+            <button id="prev-btn" class="control-btn">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button id="next-btn" class="control-btn">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </main>
+      </section>
+
+      <!-- Divider -->
+      <div class="section-divider"></div>
+
+      <!-- Classroom Section -->
+      <section class="classroom-section">
+        <!-- Teacher Desk -->
+        <div class="teacher-desk">Teacher's Desk</div>
+
+        <!-- Classroom Details -->
+        <section class="classroom-details">
+          <div class="card">
+            <h2>50</h2>
+            <p>Students</p>
+          </div>
+          <div class="card">
+            <h2>5</h2>
+            <p>Subjects</p>
+          </div>
+          <div class="card">
+            <h2>3</h2>
+            <p>Teachers</p>
+          </div>
+        </section>
+
+        <!-- Positive Thought -->
+        <div class="thought" id="thought"></div>
+
+        <!-- Achievements -->
+        <section class="achievements">
+          <div class="item">
+            <img
+              src="https://via.placeholder.com/300x200"
+              alt="Achievement 1"
+            />
+            <h3>Math Olympiad</h3>
+            <p>Our student ranked #1 in National Math Olympiad 2025.</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://via.placeholder.com/300x200"
+              alt="Achievement 2"
+            />
+            <h3>Robotics Competition</h3>
+            <p>Class team won Best Design Award in Robotics Fest.</p>
+          </div>
+        </section>
+      </section>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Carousel Elements
+        const carousel = document.getElementById("memory-carousel");
+        const cards = document.querySelectorAll(".memory-card");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+
+        // Carousel Variables
+        let currentIndex = 0;
+        let startX, startY;
+        let isDragging = false;
+        let theta = 0;
+        let radius = window.innerWidth <= 768 ? 250 : 400;
+        const totalCards = cards.length;
+
+        // Initialize Carousel
+        function init() {
+          // Position cards in a circle
+          arrangeCards();
+
+          // Add event listeners
+          prevBtn.addEventListener("click", prevCard);
+          nextBtn.addEventListener("click", nextCard);
+          cards.forEach((card) => {
+            card.addEventListener("click", flipCard);
+          });
+
+          // Touch/mouse events for dragging
+          carousel.addEventListener("mousedown", dragStart);
+          carousel.addEventListener("touchstart", dragStart, { passive: true });
+          document.addEventListener("mousemove", drag);
+          document.addEventListener("touchmove", drag, { passive: false });
+          document.addEventListener("mouseup", dragEnd);
+          document.addEventListener("touchend", dragEnd);
+
+          // Keyboard navigation
+          document.addEventListener("keydown", handleKeyDown);
+
+          // Start ambient sound
+          playAmbientSound();
+        }
+
+        // Arrange cards in a circle
+        function arrangeCards() {
+          const angle = 360 / totalCards;
+          cards.forEach((card, index) => {
+            const cardAngle = angle * index;
+            const rad = (cardAngle * Math.PI) / 180;
+            const x = radius * Math.sin(rad);
+            const z = radius * Math.cos(rad) * -1;
+            card.style.transform = `rotateY(${cardAngle}deg) translateZ(${radius}px)`;
+            card.dataset.index = index;
+          });
+        }
+
+        // Rotate carousel
+        function rotateCarousel() {
+          carousel.style.transform = `rotateY(${theta}deg)`;
+          currentIndex = Math.round(
+            Math.abs(theta / (360 / totalCards)) % totalCards
+          );
+          if (currentIndex >= totalCards) currentIndex = 0;
+        }
+
+        // Next card
+        function nextCard() {
+          theta -= 360 / totalCards;
+          rotateCarousel();
+        }
+
+        // Previous card
+        function prevCard() {
+          theta += 360 / totalCards;
+          rotateCarousel();
+        }
+
+        // Flip card
+        function flipCard(e) {
+          const card = e.currentTarget;
+          const cardIndex = parseInt(card.dataset.index);
+          if (cardIndex === currentIndex) {
+            card.classList.toggle("flipped");
+          }
+        }
+
+        // Drag functions
+        function dragStart(e) {
+          e.preventDefault();
+          isDragging = true;
+          startX = e.pageX || e.touches[0].pageX;
+        }
+
+        function drag(e) {
+          if (!isDragging) return;
+          e.preventDefault();
+          const currentX = e.pageX || (e.touches ? e.touches[0].pageX : startX);
+          const diffX = currentX - startX;
+          const sensitivity = 0.5;
+          const newTheta = theta + diffX * sensitivity;
+          carousel.style.transform = `rotateY(${newTheta}deg)`;
+        }
+
+        function dragEnd(e) {
+          if (!isDragging) return;
+          isDragging = false;
+          const currentX =
+            e.pageX || (e.changedTouches ? e.changedTouches[0].pageX : startX);
+          const diffX = currentX - startX;
+          if (Math.abs(diffX) > 20) {
+            if (diffX > 0) {
+              prevCard();
+            } else {
+              nextCard();
+            }
+          } else {
+            const anglePerCard = 360 / totalCards;
+            const snapAngle = Math.round(theta / anglePerCard) * anglePerCard;
+            theta = snapAngle;
+            rotateCarousel();
+          }
+        }
+
+        // Keyboard navigation
+        function handleKeyDown(e) {
+          if (e.key === "ArrowLeft") {
+            nextCard();
+          } else if (e.key === "ArrowRight") {
+            prevCard();
+          } else if (e.key === "Enter" || e.key === " ") {
+            const currentCard = document.querySelector(
+              `.memory-card[data-index="${currentIndex}"]`
+            );
+            if (currentCard) {
+              currentCard.classList.toggle("flipped");
+            }
+          }
+        }
+
+        // Play ambient sound
+        function playAmbientSound() {
+          // Optional: Add ambient sound if needed
+        }
+
+        // Resize handler
+        window.addEventListener("resize", () => {
+          radius = window.innerWidth <= 768 ? 250 : 400;
+          arrangeCards();
+          rotateCarousel();
+        });
+
+        // Auto-generating Thought
+        const thoughts = [
+          "Success is the sum of small efforts repeated daily.",
+          "Dream big, work hard, stay focused.",
+          "Discipline is the bridge between goals and achievement.",
+          "Your attitude determines your direction.",
+          "Push yourself, because no one else will."
+        ];
+
+        function updateThought() {
+          const thoughtEl = document.getElementById("thought");
+          const randomIndex = Math.floor(Math.random() * thoughts.length);
+          thoughtEl.textContent = thoughts[randomIndex];
+        }
+
+        // Initialize both carousel and thought
+        init();
+        updateThought();
+        setInterval(updateThought, 5000);
+      });
+    </script>
+  </body>
+</html>

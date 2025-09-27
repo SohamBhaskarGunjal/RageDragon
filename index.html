@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student/Teacher Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #2e003e, #000000);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            flex-direction: column;
+        }
+
+        .role-selection {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .role-selection h1 {
+            color: #bb86fc;
+            margin-bottom: 20px;
+        }
+
+        .role-selection button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 16px;
+            background: #bb86fc;
+            border: none;
+            border-radius: 8px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .role-selection button:hover {
+            background: #9a67ea;
+        }
+
+        .container {
+            width: 420px;
+            height: 460px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+            display: none;
+        }
+
+        .form-container {
+            width: 200%;
+            height: 100%;
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .form {
+            width: 50%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #bb86fc;
+        }
+
+        .form input {
+            width: 90%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: #1e1e1e;
+            color: white;
+        }
+
+        .form input::placeholder {
+            color: #aaa;
+        }
+
+        .form button {
+            width: 95%;
+            padding: 10px;
+            background: #bb86fc;
+            border: none;
+            border-radius: 6px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .form button:hover {
+            background: #9a67ea;
+        }
+
+        .toggle-btn,
+        .back-btn {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .toggle-btn button,
+        .back-btn button {
+            background: none;
+            border: none;
+            color: #bb86fc;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            bottom: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="role-selection">
+        <h1>Login as:</h1>
+        <button id="studentBtn">Student</button>
+        <button id="teacherBtn">Teacher</button>
+    </div>
+
+    <div class="container" id="loginContainer">
+        <div class="form-container" id="formContainer">
+            <!-- Login Form -->
+            <div class="form login" id="loginForm">
+                <h2 id="loginTitle">Login</h2>
+                <input type="text" placeholder="Username" id="loginUsername">
+                <input type="password" placeholder="Password" id="loginPassword">
+                <input type="text" placeholder="" id="loginExtra" style="display:none;">
+                <button id="loginBtn">Login</button>
+            </div>
+
+            <!-- Signup Form -->
+            <div class="form signup" id="signupForm">
+                <h2 id="signupTitle">Sign Up</h2>
+                <input type="text" placeholder="Username" id="signupUsername">
+                <input type="email" placeholder="Email" id="signupEmail">
+                <input type="password" placeholder="Password" id="signupPassword">
+                <input type="text" placeholder="" id="signupExtra" style="display:none;">
+                <button id="signupBtn">Sign Up</button>
+            </div>
+        </div>
+
+        <div class="back-btn">
+            <button id="backBtn">← Back</button>
+        </div>
+
+        <div class="toggle-btn">
+            <button id="toggleBtn">Don't have an account? Sign Up</button>
+        </div>
+    </div>
+
+    <script>
+        const studentBtn = document.getElementById('studentBtn');
+        const teacherBtn = document.getElementById('teacherBtn');
+        const loginContainer = document.getElementById('loginContainer');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const backBtn = document.getElementById('backBtn');
+        const formContainer = document.getElementById('formContainer');
+
+        const loginTitle = document.getElementById('loginTitle');
+        const signupTitle = document.getElementById('signupTitle');
+
+        const loginExtra = document.getElementById('loginExtra');
+        const signupExtra = document.getElementById('signupExtra');
+
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+
+        const signupUsername = document.getElementById('signupUsername');
+        const signupEmail = document.getElementById('signupEmail');
+        const signupPassword = document.getElementById('signupPassword');
+
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+
+        let isLogin = true;
+        let selectedRole = '';
+
+        studentBtn.addEventListener('click', () => showLogin('Student'));
+        teacherBtn.addEventListener('click', () => showLogin('Teacher'));
+
+        function showLogin(role) {
+            selectedRole = role;
+            document.querySelector('.role-selection').style.display = 'none';
+            loginContainer.style.display = 'block';
+            formContainer.style.transform = 'translateX(0)';
+            toggleBtn.textContent = "Don't have an account? Sign Up";
+            isLogin = true;
+
+            loginTitle.textContent = `${role} Login`;
+            signupTitle.textContent = `${role} Sign Up`;
+
+            if (role === 'Student') {
+                loginExtra.placeholder = 'Degree Name';
+                signupExtra.placeholder = 'Degree Name';
+            } else {
+                loginExtra.placeholder = 'Department Name';
+                signupExtra.placeholder = 'Department Name';
+            }
+
+            loginExtra.style.display = 'block';
+            signupExtra.style.display = 'block';
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            if (isLogin) {
+                formContainer.style.transform = 'translateX(-50%)';
+                toggleBtn.textContent = 'Already have an account? Login';
+            } else {
+                formContainer.style.transform = 'translateX(0)';
+                toggleBtn.textContent = "Don't have an account? Sign Up";
+            }
+            isLogin = !isLogin;
+        });
+
+        backBtn.addEventListener('click', () => {
+            loginContainer.style.display = 'none';
+            document.querySelector('.role-selection').style.display = 'block';
+        });
+
+        // ----- Node.js Backend Signup -----
+        signupBtn.addEventListener('click', async () => {
+            const username = signupUsername.value;
+            const email = signupEmail.value;
+            const password = signupPassword.value;
+            const extra = signupExtra.value;
+
+            if (!username || !email || !password || !extra) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:3000/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: selectedRole, username, email, password, extra })
+                });
+                const data = await res.json();
+                alert(data.message);
+                signupUsername.value = signupEmail.value = signupPassword.value = signupExtra.value = '';
+            } catch (err) {
+                alert('Error connecting to server');
+            }
+        });
+
+        // ----- Node.js Backend Login with redirect -----
+        loginBtn.addEventListener('click', async () => {
+            const username = loginUsername.value;
+            const password = loginPassword.value;
+            const extra = loginExtra.value;
+
+            if (!username || !password || !extra) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:3000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: selectedRole, username, password, extra })
+                });
+                const data = await res.json();
+                alert(data.message);
+                if (data.success) {
+                    loginUsername.value = loginPassword.value = loginExtra.value = '';
+
+                    // ✅ Redirect to respective page
+                    if (selectedRole === 'Student') {
+                        window.location.href = 'new1.html';
+                    } else if (selectedRole === 'Teacher') {
+                        window.location.href = 'focus.html';
+                    }
+                }
+            } catch (err) {
+                alert('Error connecting to server');
+            }
+        });
+    </script>
+
+</body>
+
+</html>

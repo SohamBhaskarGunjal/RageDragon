@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-router-dom@6.26.2/dist/umd/react-router-dom.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.25.6/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { BrowserRouter, Routes, Route, Link, useNavigate } = ReactRouterDOM;
+
+        // Navigation Component
+        const Navbar = ({ isLoggedIn, setIsLoggedIn }) => (
+            <nav className="bg-blue-600 p-4">
+                <ul className="flex space-x-4 text-white">
+                    {isLoggedIn ? (
+                        <>
+                            <li><Link to="/dashboard" className="hover:underline">Dashboard</Link></li>
+                            <li><Link to="/attendance" className="hover:underline">Attendance</Link></li>
+                            <li><Link to="/assignments" className="hover:underline">Assignments</Link></li>
+                            <li><Link to="/notes" className="hover:underline">Notes</Link></li>
+                            <li><Link to="/focus" className="hover:underline">Focus</Link></li>
+                            <li><Link to="/reply" className="hover:underline">Reply</Link></li>
+                            <li>
+                                <button
+                                    onClick={() => setIsLoggedIn(false)}
+                                    className="hover:underline"
+                                >
+                                    Logout
+                                </button>
+                            </li>
+                        </>
+                    ) : (
+                        <li><Link to="/" className="hover:underline">Login</Link></li>
+                    )}
+                </ul>
+            </nav>
+        );
+
+        // Login Component
+        const LoginPage = ({ setIsLoggedIn }) => {
+            const navigate = useNavigate();
+            const handleLogin = (role) => {
+                setIsLoggedIn(true);
+                navigate("/dashboard");
+            };
+            return (
+                <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+                    <h1 className="text-3xl font-bold mb-6">Login as:</h1>
+                    <div className="space-y-4">
+                        <button
+                            onClick={() => handleLogin("student")}
+                            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                        >
+                            Login as Student
+                        </button>
+                        <button
+                            onClick={() => handleLogin("teacher")}
+                            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                        >
+                            Login as Teacher
+                        </button>
+                        <button
+                            onClick={() => alert("Sign Up functionality not implemented")}
+                            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+                        >
+                            Sign Up
+                        </button>
+                    </div>
+                    <Link to="/" className="mt-4 text-blue-600 hover:underline">← Back</Link>
+                    <p className="mt-2">Don't have an account? <Link to="/" className="text-blue-600 hover:underline">Sign Up</Link></p>
+                </div>
+            );
+        };
+
+        // Dashboard Component
+        const Dashboard = () => (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Welcome, Student! Let's get started!</h2>
+                <div className="bg-yellow-100 p-4 rounded">
+                    <h3 className="font-semibold">Interesting Thing!</h3>
+                    <p>Now you can ask your doubts anonymously</p>
+                    <Link to="/doubt" className="text-blue-600 hover:underline">Ask Now!</Link>
+                </div>
+            </div>
+        );
+
+        // Attendance Component
+        const Attendance = () => (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Your Attendance</h2>
+                <p className="mb-2">Overall Attendance: No Data</p>
+                <h3 className="font-semibold">Subject-wise Attendance</h3>
+                <p>No Data Available</p>
+                <p className="mt-2">Defaulter Status: No Data</p>
+            </div>
+        );
+
+        // Assignments Component
+        const Assignments = () => (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Your Assignments</h2>
+                <p>No assignments available</p>
+            </div>
+        );
+
+        // Notes Component
+        const Notes = () => (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Your Notes</h2>
+                <p>No notes available</p>
+            </div>
+        );
+
+        // Focus Component
+        const Focus = () => {
+            const [hours, setHours] = useState(0);
+            const [minutes, setMinutes] = useState(0);
+            const [plant, setPlant] = useState("");
+            return (
+                <div className="p-6">
+                    <h2 className="text-2xl font-bold mb-4">Focus Mode</h2>
+                    <div className="mb-4">
+                        <label className="block mb-2">Hours:</label>
+                        <select
+                            value={hours}
+                            onChange={(e) => setHours(e.target.value)}
+                            className="border p-2 rounded"
+                        >
+                            {[0, 1, 2, 3, 4, 5].map(h => (
+                                <option key={h} value={h}>{h}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block mb-2">Minutes:</label>
+                        <select
+                            value={minutes}
+                            onChange={(e) => setMinutes(e.target.value)}
+                            className="border p-2 rounded"
+                        >
+                            {[0, 10, 20, 30, 40, 50].map(m => (
+                                <option key={m} value={m}>{m}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <p className="mb-4">00:00:00</p>
+                    <div className="mb-4">
+                        <button className="bg-blue-500 text-white px-4 py-2 rounded mr-2">Select Plant</button>
+                        <button className="bg-green-500 text-white px-4 py-2 rounded mr-2">Start</button>
+                        <button className="bg-gray-500 text-white px-4 py-2 rounded mr-2">View Records</button>
+                        <button className="bg-red-500 text-white px-4 py-2 rounded">Quit</button>
+                    </div>
+                    <div className="bg-green-100 p-4 rounded">
+                        <h3 className="font-semibold">Select a Plant 🌱</h3>
+                        <ul className="list-disc pl-5">
+                            <li onClick={() => setPlant("Rose")} className="cursor-pointer">🌹 Rose</li>
+                            <li onClick={() => setPlant("Tulip")} className="cursor-pointer">🌷 Tulip</li>
+                            <li onClick={() => setPlant("Sunflower")} className="cursor-pointer">🌻 Sunflower</li>
+                            <li onClick={() => setPlant("Cactus")} className="cursor-pointer">🌵 Cactus</li>
+                            <li onClick={() => setPlant("Bonsai")} className="cursor-pointer">🌳 Bonsai</li>
+                        </ul>
+                        {plant && <p>Selected: {plant}</p>}
+                        <button className="text-blue-600 hover:underline">Back</button>
+                    </div>
+                    <div className="mt-4">
+                        <h3 className="font-semibold">📖 Focus Records</h3>
+                        <p>No records available</p>
+                        <button className="text-blue-600 hover:underline">Close</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // Doubt Component
+        const Doubt = () => (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Ask Your Doubt</h2>
+                <textarea className="w-full border p-2 rounded mb-4" rows="5" placeholder="Type your doubt here..."></textarea>
+                <div>
+                    <button className="bg-blue-500 text-white px-4 py-2 rounded mr-2">Send</button>
+                    <Link to="/dashboard" className="text-blue-600 hover:underline">Back</Link>
+                </div>
+            </div>
+        );
+
+        // Reply Component
+        const Reply = () => (
+            <div className="p-6">
+                <h2 className="text-2xl font-bold mb-4">Teacher Replies</h2>
+                <p>No replies yet</p>
+            </div>
+        );
+
+        // Main App Component
+        const App = () => {
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            return (
+                <BrowserRouter>
+                    <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+                    <Routes>
+                        <Route path="/" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                        <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                        <Route path="/attendance" element={isLoggedIn ? <Attendance /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                        <Route path="/assignments" element={isLoggedIn ? <Assignments /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                        <Route path="/notes" element={isLoggedIn ? <Notes /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                        <Route path="/focus" element={isLoggedIn ? <Focus /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                        <Route path="/doubt" element={isLoggedIn ? <Doubt /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                        <Route path="/reply" element={isLoggedIn ? <Reply /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />} />
+                    </Routes>
+                </BrowserRouter>
+            );
+        };
+
+        // Render the App
+        ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+</body>
+</html>
